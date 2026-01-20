@@ -193,6 +193,14 @@ jobs:
         run: newman run collectionjson
 ```
 
+> **Nota:** 
+  es importante que el archivo collection.json este en la carpeta .github/workflows
+
+  ### para crearlo debes ir actions luego configure y crear un workflow manualmente como aparece en la imagen
+  ![imagen](images/01-github-actions.png)
+
+  ### Luego pones un nombre para el workflow y pones el codigo que esta arriba en la imagen
+  ![imagen](images/02-github-actions.png)
 
 # 🚀 GitHub Action con Reporte HTML Automatizado
 
