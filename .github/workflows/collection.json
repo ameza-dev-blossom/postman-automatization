@@ -1,0 +1,67 @@
+{
+  "info": {
+    "_postman_id": "07009bf5-af22-4ec0-b008-5c1d55c3332f",
+    "name": "Pruebas Automatizadas JSONPlaceholder",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51668027",
+    "_collection_link": "https://go.postman.co/collection/51668027-07009bf5-af22-4ec0-b008-5c1d55c3332f?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Posts",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test 1: Validar que el servidor responda con éxito (201 Creado)",
+              "pm.test(\"Status code es 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "// Test 2: Validar que el tiempo de respuesta sea rápido",
+              "pm.test(\"Tiempo de respuesta es menor a 500ms\", function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(500);",
+              "});",
+              "",
+              "// Test 3: Validar que el título devuelto sea el correcto",
+              "pm.test(\"El título en la respuesta es correcto\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.title).to.eql(\"Mi Post de Prueba\");",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Mi Post de Prueba\",\n  \"body\": \"Este es el contenido\",\n  \"userId\": 1\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://jsonplaceholder.typicode.com/posts",
+          "protocol": "https",
+          "host": [
+            "jsonplaceholder",
+            "typicode",
+            "com"
+          ],
+          "path": [
+            "posts"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
