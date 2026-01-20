@@ -1,7 +1,7 @@
 name: API Automated Tests
 on:
   schedule:
-    - cron: '*/5 * * * *' # Ejecución diaria a las 12:00 UTC
+    - cron: '0 12 * * *' # Ejecución diaria a las 12:00 UTC
   push:
     branches: [ main ] # Ejecución al subir cambios a main
   workflow_dispatch: # Permite ejecutar el test manualmente desde el botón "Run workflow"
