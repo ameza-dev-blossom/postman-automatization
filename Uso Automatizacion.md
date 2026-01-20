@@ -204,6 +204,7 @@ jobs:
 
   ### para verlos test en github actions ve a la pestaña actions y veras los test que se hicieron si hay error da click sobre el nombre del test y veras el detalle del error
   ![imagen](images/03-github-actions.png)
+
 # 🚀 GitHub Action con Reporte HTML Automatizado
 
 Este archivo configura la ejecución diaria de tus pruebas y guarda el reporte visual como un "Artefacto" de GitHub, permitiéndote descargar el informe detallado después de cada ejecución.
@@ -256,4 +257,10 @@ jobs:
           name: reporte-de-pruebas-api
           path: reports/reporte_api.html
 ```
+
+### para verlos el reporte en github actions ve a la pestaña actions y veras los test que se hicieron en este caso el reporte se llama reporte-de-pruebas-api
+  ![imagen](images/04-github-actions.png)
+
+### para verlos el reporte dale click en el nombre del reporte y en la parte final veras una seccion que se llama artefacts veras un archivo .zip que es el reporte debes descargarlo y abrirlo con un navegador
+  ![imagen](images/05-github-actions.png)
 
