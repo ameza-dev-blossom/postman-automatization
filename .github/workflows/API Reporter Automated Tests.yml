@@ -1,0 +1,38 @@
+name: API Automated Tests
+on:
+  schedule:
+    - cron: '*/5 * * * *' # Ejecución diaria a las 12:00 UTC
+  push:
+    branches: [ main ] # Ejecución al subir cambios a main
+  workflow_dispatch: # Permite ejecutar el test manualmente desde el botón "Run workflow"
+
+jobs:
+  test-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. Descargar código del repositorio
+        uses: actions/checkout@v3
+
+      - name: 2. Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: 3. Instalar Newman y Reportero HTML
+        run: |
+          npm install -g newman
+          npm install -g newman-reporter-htmlextra
+
+      - name: 4. Ejecutar Pruebas y Crear Reporte
+        # Nota: Asegúrate de que el nombre de tu archivo .json sea correcto
+        run: |
+          mkdir -p reports
+          newman run collection.json -r htmlextra --reporter-htmlextra-export reports/reporte_api.html
+
+      - name: 5. Subir Reporte como Artefacto
+        # Esto guarda el archivo en GitHub para que lo puedas descargar
+        if: always() # Se ejecuta incluso si los tests fallan
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporte-de-pruebas-api
+          path: reports/reporte_api.html

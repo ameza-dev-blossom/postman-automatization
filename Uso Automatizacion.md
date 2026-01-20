@@ -202,6 +202,8 @@ jobs:
   ### Luego pones un nombre para el workflow y pones el codigo que esta arriba en la imagen
   ![imagen](images/02-github-actions.png)
 
+  ### para verlos test en github actions ve a la pestaña actions y veras los test que se hicieron si hay error da click sobre el nombre del test y veras el detalle del error
+  ![imagen](images/03-github-actions.png)
 # 🚀 GitHub Action con Reporte HTML Automatizado
 
 Este archivo configura la ejecución diaria de tus pruebas y guarda el reporte visual como un "Artefacto" de GitHub, permitiéndote descargar el informe detallado después de cada ejecución.
@@ -211,9 +213,10 @@ Este archivo configura la ejecución diaria de tus pruebas y guarda el reporte v
 ## 📄 Configuración del Workflow (.github/workflows/api_tests.yml)
 
 Copia y pega este código en tu archivo YAML:
+> **Nota:** 
+  los pasos son igual a los anteriores solo que debes copiar el codigo que esta abajo es importante que el archivo collection.json este en la carpeta .github/workflows
 
 ```
-yaml
 name: API Automated Tests
 on:
   schedule:
