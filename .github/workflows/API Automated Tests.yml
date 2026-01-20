@@ -1,0 +1,23 @@
+name: API Automated Tests
+on:
+  schedule:
+    - cron:    '*/5 * * * *' # Se ejecuta cada 5 minutos
+  push:
+    branches: [ main ] # También corre cuando subes cambios
+
+jobs:
+  test-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Run API Tests
+        run: newman run collectionjson
