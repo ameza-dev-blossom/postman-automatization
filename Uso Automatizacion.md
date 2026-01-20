@@ -68,16 +68,45 @@ Para automatizar la ejecución en tu Mac y evitar el proceso manual, sigue estos
 2. Guárdala en una ruta conocida, por ejemplo: ~/Documents/QA/.
 
 ## 2. Ejecución Manual por Terminal
-Instala y corre el paquete  donde collection.json es el archivo que exportaste de Postman, con el siguiente comando:
+Instala y corre el paquete  donde collection.json es el archivo que exportaste de Postman, con el siguiente comando: 
+
+
+> **versiones recientes de node**
 
 ```bash
-sudo npm install -g newman
 
-sudo npm install -g newman-reporter-htmlextra
+sudo npm install -g newman@latest newman-reporter-htmlextra@latest 
+
+```
+
+### para correr por consola 
+```bash
+newman run collection.json
+```
+
+> **versiones mas antiguas de node**
+
+```bash
+sudo npm install -g newman newman-reporter-htmlextra
+```
+
+### para correr por consola con reporter
+```bash
+newman run collection.json -r cli,htmlextra --reporter-htmlextra-export ./reporte_final.html
+```
+
+
 
 newman run collection.json 
 ```
+
 > **Nota:** Si no reconoce el comando newman cierra y abre la terminal de nuevo. newman-reporter-htmlextra Para transformar los resultados de la consola en reportes visuales interactivos
+
+
+#### en la carpeta donde esta je json 
+```bash
+sudo npm install newman-reporter-html
+```
 
 ### Para automatizar esto en Mac y que se ejecute solo (sin que tengas que darle al botón de "Run"), tienes dos caminos principales: 
 
