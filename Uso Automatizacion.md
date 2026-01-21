@@ -264,3 +264,96 @@ jobs:
 ### para verlos el reporte dale click en el nombre del reporte y en la parte final veras una seccion que se llama artefacts veras un archivo .zip que es el reporte debes descargarlo y abrirlo con un navegador
   ![imagen](images/05-github-actions.png)
 
+
+
+## 1. Configuración de la Colección en Postman
+>***👁️👁️👁️👁️ Sin VPN no va a funcionar***
+
+### una vez que tienes tu coleccion lista para en postman debes asegurarte de que las variables de entorno esten bien configuradas
+
+![alt text](images/01-postman.png)
+
+
+### para configurar los test en postman debes ir a la pestaña de tests y pos request
+
+#### Definir Pruebas Automatizadas
+ - Agregar scripts de prueba básicos para validar:
+  - Códigos de estado de la respuesta
+  - Estructura de la respuesta
+  - Reglas de negocio clave
+
+![alt text](images/02-postman.png)
+
+```
+
+// 1. Validar Estado y Formato
+pm.test("Status 201 - Request Recibido", function () {
+    pm.response.to.have.status(201);
+    pm.response.to.be.json;
+});
+
+const jsonData = pm.response.json();
+
+// 2. Procesar variable de entorno (maneja [525] o [525, 528])
+const rawCode = pm.environment.get("code_exceptions");
+const codesArray = rawCode ? rawCode.replace(/[\[\]\s]/g, "").split(",") : [];
+
+// 3. Validar existencia de propiedades principales (Estructura de la respuesta)
+pm.test("Validar existencia de propiedades raíz y data", function () {
+    const rootProps = ["requestId", "data"];
+    rootProps.forEach(prop => {
+        pm.expect(jsonData, `Falta la propiedad raíz: ${prop}`).to.have.property(prop);
+    });
+
+    // Validar que dentro de data existan processing (array) y unprocessable (objeto)
+    pm.expect(jsonData.data).to.have.property('processing').and.be.an('array');
+    pm.expect(jsonData.data).to.have.property('unprocessable').and.be.an('object');
+});
+
+// 4. Validar que cada código enviado sea una LLAVE en 'unprocessable'
+pm.test(`Validar que IDs (${codesArray.join(", ")}) existan como llaves en unprocessable`, function () {
+    const unprocessable = jsonData.data.unprocessable;
+    
+    codesArray.forEach(code => {
+        // Verifica que la llave exista (ej: "525")
+        pm.expect(unprocessable, `El ID ${code} no es una llave en unprocessable`).to.have.property(code);
+        
+        const errorDetail = unprocessable[code];
+
+        // Verifica que el objeto de ese ID tenga sus propiedades de error
+        const errorProps = ["errorCode", "message"];
+        errorProps.forEach(prop => {
+            pm.expect(errorDetail, `El error para el ID ${code} no tiene la propiedad: ${prop}`).to.have.property(prop);
+        });
+
+        // Validar el contenido específico del mensaje de error
+        pm.expect(errorDetail.errorCode).to.eql("EXCEPTION_NOT_FOUND");
+        pm.expect(errorDetail.message).to.eql("The card exception with the provided ID was not found");
+    });
+});
+
+// 5. Guardar el requestId para uso posterior
+if (jsonData.requestId) {
+    pm.collectionVariables.set("lastPostRequestId", jsonData.requestId);
+}
+
+
+console.log(`Estructura validada. Procesados: ${jsonData.data.processing.length}, Errores: ${codesArray.length}`);
+
+```
+
+### para correr los test en postman debes darle click el los tres punticos de la carpeta principal  mirar la imagen a continuacion
+![alt text](images/03-postman.png)
+
+### las flechas verdes indican que puedes cambiar el orden en que se ejecutan 
+las flechas rojas el tipo de ejecucion que se va a ejecutar
+![alt text](images/04-postman.png)
+
+
+### aqui puedes configurar los tests que se van a ejecutar en cada cuanto tiempo, esto corre en el cloud de postman pero  👁️ sin vpn no funciona, te manda al email el resultado del test
+![alt text](images/05-postman.png)
+
+
+
+
+
