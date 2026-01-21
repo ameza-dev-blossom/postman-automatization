@@ -1,0 +1,236 @@
+{
+  "info": {
+    "_postman_id": "17768d4e-3ca6-4aaa-8826-8361f70f356e",
+    "name": "Blossom Exceptions",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51668027",
+    "_collection_link": "https://go.postman.co/collection/51668027-17768d4e-3ca6-4aaa-8826-8361f70f356e?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "https://blossom-dream-api-development.blossomdev.com/transactions/exceptions",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// 1. Validar Estado y Formato",
+              "pm.test(\"Status 201 - Request Recibido\", function () {",
+              "    pm.response.to.have.status(201);",
+              "    pm.response.to.be.json;",
+              "});",
+              "",
+              "const jsonData = pm.response.json();",
+              "",
+              "// 2. Procesar variable de entorno (maneja [525] o [525, 528])",
+              "const rawCode = pm.environment.get(\"code_exceptions\");",
+              "const codesArray = rawCode ? rawCode.replace(/[\\[\\]\\s]/g, \"\").split(\",\") : [];",
+              "",
+              "// 3. Validar existencia de propiedades principales (Estructura de la respuesta)",
+              "pm.test(\"Validar existencia de propiedades raíz y data\", function () {",
+              "    const rootProps = [\"requestId\", \"data\"];",
+              "    rootProps.forEach(prop => {",
+              "        pm.expect(jsonData, `Falta la propiedad raíz: ${prop}`).to.have.property(prop);",
+              "    });",
+              "",
+              "    // Validar que dentro de data existan processing (array) y unprocessable (objeto)",
+              "    pm.expect(jsonData.data).to.have.property('processing').and.be.an('array');",
+              "    pm.expect(jsonData.data).to.have.property('unprocessable').and.be.an('object');",
+              "});",
+              "",
+              "// 4. Validar que cada código enviado sea una LLAVE en 'unprocessable'",
+              "pm.test(`Validar que IDs (${codesArray.join(\", \")}) existan como llaves en unprocessable`, function () {",
+              "    const unprocessable = jsonData.data.unprocessable;",
+              "    ",
+              "    codesArray.forEach(code => {",
+              "        // Verifica que la llave exista (ej: \"525\")",
+              "        pm.expect(unprocessable, `El ID ${code} no es una llave en unprocessable`).to.have.property(code);",
+              "        ",
+              "        const errorDetail = unprocessable[code];",
+              "",
+              "        // Verifica que el objeto de ese ID tenga sus propiedades de error",
+              "        const errorProps = [\"errorCode\", \"message\"];",
+              "        errorProps.forEach(prop => {",
+              "            pm.expect(errorDetail, `El error para el ID ${code} no tiene la propiedad: ${prop}`).to.have.property(prop);",
+              "        });",
+              "",
+              "        // Validar el contenido específico del mensaje de error",
+              "        pm.expect(errorDetail.errorCode).to.eql(\"EXCEPTION_NOT_FOUND\");",
+              "        pm.expect(errorDetail.message).to.eql(\"The card exception with the provided ID was not found\");",
+              "    });",
+              "});",
+              "",
+              "// 5. Guardar el requestId para uso posterior",
+              "if (jsonData.requestId) {",
+              "    pm.collectionVariables.set(\"lastPostRequestId\", jsonData.requestId);",
+              "}",
+              "",
+              "// 6. CONTROL DE ORDEN (Importante para evitar bucles)",
+              "// Si esta es la última prueba de la carpeta, dejar en null.",
+              "pm.execution.setNextRequest(null);",
+              "",
+              "console.log(`Estructura validada. Procesados: ${jsonData.data.processing.length}, Errores: ${codesArray.length}`);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "olb-user",
+            "value": "123"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"exceptions\": {{code_exceptions}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://blossom-dream-api-development.blossomdev.com/transactions/exceptions",
+          "protocol": "https",
+          "host": [
+            "blossom-dream-api-development",
+            "blossomdev",
+            "com"
+          ],
+          "path": [
+            "transactions",
+            "exceptions"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request POST 'https://blossom-dream-api-development.blossomdev.com/transactions/exceptions' \\\n--header 'olb-user: 123' \\\n--header 'Content-Type: application/json' \\\n--data-raw '{\n    \"exceptions\": [525]\n}'"
+      },
+      "response": []
+    },
+    {
+      "name": "https://blossom-dream-api-development.blossomdev.com/transactions/exceptions/pending",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// 1. Validar Código de Estado y Formato",
+              "pm.test(\"Status 200 - OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "    pm.response.to.be.json;",
+              "});",
+              "",
+              "var jsonData = pm.response.json();",
+              "",
+              "// 2. Validar Estructura General",
+              "pm.test(\"Estructura base: requestId y data presentes\", function () {",
+              "    pm.expect(jsonData).to.have.property('requestId');",
+              "    pm.expect(jsonData.data).to.have.property('results').and.be.an('array');",
+              "});",
+              "",
+              "// 3. Validar existencia de todas las propiedades en los objetos del array",
+              "pm.test(\"Cada objeto en 'results' tiene todas las propiedades requeridas\", function () {",
+              "    const results = jsonData.data.results;",
+              "    ",
+              "    // Validamos el primer elemento como muestra de la estructura",
+              "    if (results.length > 0) {",
+              "        const item = results[0];",
+              "        ",
+              "        // Lista de propiedades que deben existir",
+              "        const propiedadesEsperadas = [",
+              "            \"id\", \"name\", \"memberNumber\", \"description\", \"amount\", ",
+              "            \"exception\", \"entryType\", \"source\", \"settlementDate\", ",
+              "            \"fromAccount\", \"toAccountId\", \"transactionId\", \"status\", \"debitCredit\"",
+              "        ];",
+              "",
+              "        propiedadesEsperadas.forEach(prop => {",
+              "            pm.expect(item, `Falta la propiedad: ${prop}`).to.have.property(prop);",
+              "        });",
+              "",
+              "        // Validación de la sub-estructura fromAccount (si no es null)",
+              "        if (item.fromAccount !== null) {",
+              "            const fromAccountProps = [\"id\", \"number\", \"code\", \"cards\", \"cardCount\"];",
+              "            fromAccountProps.forEach(subProp => {",
+              "                pm.expect(item.fromAccount).to.have.property(subProp);",
+              "            });",
+              "        }",
+              "    } else {",
+              "        pm.expect.fail(\"El array 'results' está vacío, no se pudo validar la estructura interna.\");",
+              "    }",
+              "});",
+              "",
+              "// 4. Validar propiedades de paginación",
+              "pm.test(\"Campos de paginación presentes\", function () {",
+              "    pm.expect(jsonData.data).to.have.property('totalRecords');",
+              "    pm.expect(jsonData.data).to.have.property('totalPages');",
+              "    pm.expect(jsonData.data).to.have.property('currentPage');",
+              "});",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "olb-user",
+            "value": "123"
+          }
+        ],
+        "url": {
+          "raw": "https://blossom-dream-api-development.blossomdev.com/transactions/exceptions/pending",
+          "protocol": "https",
+          "host": [
+            "blossom-dream-api-development",
+            "blossomdev",
+            "com"
+          ],
+          "path": [
+            "transactions",
+            "exceptions",
+            "pending"
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request GET 'https://blossom-dream-api-development.blossomdev.com/transactions/exceptions/pending' \\\n--header 'olb-user: 123'"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "lastRequestId",
+      "value": ""
+    },
+    {
+      "key": "lastGetRequestId",
+      "value": ""
+    },
+    {
+      "key": "lastPostRequestId",
+      "value": ""
+    }
+  ]
+}
