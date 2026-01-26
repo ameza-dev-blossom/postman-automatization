@@ -355,5 +355,39 @@ las flechas rojas el tipo de ejecucion que se va a ejecutar
 
 
 
+## 🛡️ Soluciones de Conectividad (Uso de VPN)
+
+Cuando la API está protegida por una red privada (VPN), las herramientas en la nube como **GitHub Actions** o **Postman Cloud** no pueden alcanzar los endpoints de forma predeterminada. A continuación, se detallan las recomendaciones para solucionar este bloqueo:
+
+### 1. GitHub Actions: Self-Hosted Runners (Recomendado)
+Para que tus pruebas de CI/CD funcionen, no debes usar los servidores públicos de GitHub, sino un **agente propio**.
+
+* **¿Cómo funciona?**: Instalas un pequeño software (Runner) en una máquina o servidor que ya tenga acceso a la VPN de la empresa.
+* **Configuración**:
+    1. En tu repositorio de GitHub, ve a `Settings > Actions > Runners > New self-hosted runner`.
+    2. Sigue las instrucciones para descargar y configurar el agente en tu máquina con VPN.
+    3. En tu archivo `.yml`, cambia la línea `runs-on: ubuntu-latest` por `runs-on: self-hosted`.
+* **Ventaja**: Es la opción más segura, ya que el tráfico de red se mantiene dentro de tu infraestructura y no expones la API a internet.
+
+### 2. Postman Cloud: Private Network Agent
+Si utilizas **Monitors** de Postman para programar ejecuciones en la nube:
+* Postman permite seleccionar un **agente local** en lugar de sus servidores en la nube (AWS).
+* Debes tener abierta la aplicación de escritorio de Postman con la sesión iniciada y la VPN conectada para que el "Cloud" pueda puentear la petición a través de tu conexión local.
+
+### 3. Alternativa: Túneles Seguros (ngrok)
+Si necesitas realizar una prueba rápida y no puedes configurar un Runner:
+* Puedes usar herramientas como **ngrok** para exponer temporalmente un puerto local a una URL pública.
+* **Advertencia**: Esta opción es menos segura y solo debe usarse para pruebas controladas, nunca para datos sensibles o entornos de producción, ya que creas un punto de acceso público hacia tu red privada.
+
+### 💡 Recomendación Final de Arquitectura
+| Escenario | Solución | Estado de Conexión |
+| :--- | :--- | :--- |
+| **Desarrollo/Pruebas Manuales** | Postman Desktop | VPN Activa en PC local. |
+| **Automatización CI/CD** | GitHub Self-Hosted Runner | Servidor con Runner y VPN 24/7. |
+| **Monitoreo Programado** | Postman Private Agent | Agente local vinculado a la nube. |
+
+> [!CAUTION]
+> Intentar correr estos tests en GitHub Actions sin un **Self-Hosted Runner** resultará siempre en un error de `Connection Timeout` o `EADDRNOTAVAIL`, debido a que los servidores de GitHub no tienen los certificados ni el acceso a tu red privada.
+
 
 
